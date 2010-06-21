@@ -1,0 +1,20 @@
+Hello,
+
+This repository contains an OAuth implementation written in XQuery. It
+relies on several MarkLogic extensions at the moment, so if you're not
+running on MarkLogic server, you'll have to write a few bits.
+
+Also, there's no native implementation of the HMAC-SHA1 signing algorithm
+at the moment, so this script relies on a web service to compute that.
+If you want to setup the web service yourself, my current implementation
+is in perl, hmac-sha1.
+
+Docs, etc. to follow. (In the fullness of time, like the next ice age,
+probably. If you have questions, feel free to ask.)
+
+P.S. There's definitely a bug or two at the moment, some requests
+succeed others report invalid signature. I'll fix that as soon as I
+can figure it out.
+
+--norm
+ndw@nwalsh.com

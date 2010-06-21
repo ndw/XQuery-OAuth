@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+# This perl script computes the HMAC-SHA1 signature of the provided 'data'
+# with the provided 'key'.
+
+use strict;
+use English;
+use Digest::HMAC_SHA1 qw(hmac_sha1 hmac_sha1_hex);
+use MIME::Base64;
+use CGI;
+
+print "Content-type: application/xml\n\n";
+
+my $cgi  = new CGI;
+my $key  = $cgi->param('key');
+my $data = $cgi->param('data');
+
+my $digest = hmac_sha1($data, $key);
+my $encoded = encode_base64($digest);
+chop $encoded; # don't want the newline
+my $hex = hmac_sha1_hex($data, $key);
+
+print "<digest method='hmac-sha1' encoding='base64'>\n";
+print "<key>", escape($key), "</key>\n";
+print "<data>", escape($data), "</data>\n";
+print "<hashb64>$encoded</hashb64>\n";
+print "<hashhex>$hex</hashhex>\n";
+print "</digest>\n";
+
+# ----------------------------------------------------------------------
+
+sub escape {
+    local $_ = shift;
+    s/&/&amp;/sg;
+    s/</&lt;/sg;
+    return $_;
+}
