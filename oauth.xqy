@@ -191,8 +191,6 @@ as element(oa:response)
   let $authfields := $sigstruct/*[starts-with(local-name(.), "oauth_")
                                   and not(self::oauth_callback)]
 
-  let $authfields := $sigstruct/*
-
   let $authheader := concat("OAuth realm=&quot;", $service/@realm, "&quot;, ",
                             "oauth_signature=&quot;", $signature, "&quot;, ",
                             string-join(
@@ -205,6 +203,12 @@ as element(oa:response)
                     return
                       concat(local-name($field),"=",encode-for-uri($field))
 
+   (: This strikes me as slightly weird. Twitter wants the parameters passed
+      encoded in the URI even for a POST. I don't know if that's a Twitter
+      quirk or the natural way that OAuth apps work. Anyway, if you find
+      this library isn't working for some other OAuth'd API, you might want
+      to play with this bit.
+
    let $requri   := if ($httpmethod = "GET")
                     then concat($serviceuri,
                                 if (empty($uriparam)) then ''
@@ -214,6 +218,13 @@ as element(oa:response)
    let $data     := if ($httpmethod = "POST" and not(empty($uriparam)))
                     then <xh:data>{string-join($uriparam,"&amp;")}</xh:data>
                     else ()
+   :)
+
+   let $requri   := concat($serviceuri,
+                           if (empty($uriparam)) then ''
+                           else concat("?",string-join($uriparam,"&amp;")))
+
+   let $data     := ()
 
    let $options  := <xh:options>
                       <xh:headers>
@@ -226,10 +237,12 @@ as element(oa:response)
                     then xdmp:http-get($requri, $options)
                     else xdmp:http-post($requri, $options)
 
+   (:
    let $trace := xdmp:log(concat("requri: ", $requri))
    let $trace := xdmp:log(concat("sigbse: ", $sigbase))
    let $trace := xdmp:log($options)
    let $trace := xdmp:log($tokenreq[2])
+   :)
 
   return
     <oa:response>
