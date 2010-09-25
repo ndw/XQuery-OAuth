@@ -1,0 +1,68 @@
+default namespace = "http://marklogic.com/ns/oauth"
+
+start = ServiceProvider | RequestToken | Options | Response
+
+ServiceProvider =
+   element service-provider {
+      attribute realm { text },
+      (RequestToken
+       & UserAuthorization
+       & UserAuthentication
+       & AccessToken
+       & SignatureMethods
+       & OAuthVersion
+       & Authentication)
+   }
+
+RequestToken =
+   element request-token {
+      URI & Method
+   }
+
+URI = element uri { text }
+
+Method = element method { text }
+
+UserAuthorization =
+   element user-authorization {
+      (URI)
+   }
+
+UserAuthentication =
+   element user-authentication {
+      (URI, AdditionalParams)
+   }
+
+AdditionalParams = element additional-params { text }
+
+AccessToken =
+   element access-token {
+      (URI & Method)
+   }
+
+SignatureMethods =
+   element signature-methods {
+      Method+
+   }
+
+OAuthVersion = element oauth-version { text }
+
+Authentication =
+   element authentication {
+      (ConsumerKey & ConsumerKeySecret)
+   }
+
+ConsumerKey = element consumer-key { text }
+ConsumerKeySecret = element consumer-key-secret { text }
+
+AnyElement = element * { AnyElement* | text }
+
+Options =
+   element options {
+      element * { text }+
+   }
+
+Response =
+   element response {
+      AnyElement?
+   }

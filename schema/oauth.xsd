@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="http://marklogic.com/ns/oauth" xmlns:oauth="http://marklogic.com/ns/oauth">
+  <xs:element name="service-provider">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="oauth:request-token"/>
+        <xs:element ref="oauth:user-authorization"/>
+        <xs:element ref="oauth:user-authentication"/>
+        <xs:element ref="oauth:access-token"/>
+        <xs:element ref="oauth:signature-methods"/>
+        <xs:element ref="oauth:oauth-version"/>
+        <xs:element ref="oauth:authentication"/>
+      </xs:choice>
+      <xs:attribute name="realm" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="request-token">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="oauth:uri"/>
+        <xs:element ref="oauth:method"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="uri" type="xs:string"/>
+  <xs:element name="method" type="xs:string"/>
+  <xs:element name="user-authorization">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="oauth:uri"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="user-authentication">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="oauth:uri"/>
+        <xs:element ref="oauth:additional-params"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="additional-params" type="xs:string"/>
+  <xs:element name="access-token">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="oauth:uri"/>
+        <xs:element ref="oauth:method"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="signature-methods">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="oauth:method"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="oauth-version" type="xs:string"/>
+  <xs:element name="authentication">
+    <xs:complexType>
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="oauth:consumer-key"/>
+        <xs:element ref="oauth:consumer-key-secret"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="consumer-key" type="xs:string"/>
+  <xs:element name="consumer-key-secret" type="xs:string"/>
+  <xs:group name="AnyElement">
+    <xs:sequence>
+      <xs:any processContents="skip"/>
+    </xs:sequence>
+  </xs:group>
+  <xs:element name="options">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:any maxOccurs="unbounded" processContents="skip"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="response">
+    <xs:complexType>
+      <xs:group minOccurs="0" ref="oauth:AnyElement"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
