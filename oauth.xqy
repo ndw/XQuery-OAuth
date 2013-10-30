@@ -2,11 +2,23 @@ xquery version "1.0-ml";
 
 module namespace oa="http://marklogic.com/ns/oauth";
 
+import module namespace jamu = "http://xqdev.com/jam-utils" at "jam-utils.xqy";
+
 declare namespace xh="xdmp:http";
 
 declare default function namespace "http://www.w3.org/2005/xpath-functions";
 
 declare option xdmp:mapping "false";
+
+declare variable $oa:perl-sign-uri := "http://localhost:8190/cgi-bin/hmac-sha1";
+declare variable $oa:jam-sign-uri := "http://localhost:9094/cgi-bin/hmac-sha1";
+declare variable $oa:jam-sign-user := "local";
+declare variable $oa:jam-sign-pass := "lacol";
+
+(:
+declare variable $oa:sign-mode := "perl";
+:)
+declare variable $oa:sign-mode := "jam";
 
 (:
   let $service :=
@@ -51,12 +63,26 @@ declare function oa:timestamp() as xs:unsignedLong {
 };
 
 declare function oa:sign($key as xs:string, $data as xs:string) as xs:string {
-  let $uri := concat("http://localhost:8190/cgi-bin/hmac-sha1?",
+	if ($oa:sign-mode eq "perl") then
+		oa:sign-pl($key, $data)
+	else if ($oa:sign-mode eq "jam") then
+		oa:sign-jam($key, $data)
+	else
+		error(xs:QName("oa:UNKNOWNSIGNMODE"), concat("OAuth config error: sign mode '", $oa:sign-mode, "' not supported"))
+};
+
+declare function oa:sign-pl($key as xs:string, $data as xs:string) as xs:string {
+  let $uri := concat($oa:perl-sign-uri, "?",
                      "key=", encode-for-uri($key),
                      "&amp;data=",encode-for-uri($data))
   let $resp := xdmp:http-get($uri)
   return
     string($resp/digest/hashb64)
+};
+
+declare function oa:sign-jam($key as xs:string, $data as xs:string) as xs:string {
+  jam:start($oa:jam-sign-uri, $oa:jam-sign-user, $oa:jam-sign-pass),
+  jamu:encrypt("HmacSHA1", $key, $data)
 };
 
 declare function oa:signature-method(
